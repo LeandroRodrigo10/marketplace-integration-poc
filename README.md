@@ -1,35 +1,31 @@
-# ML POC Integrator
+# Marketplace Integration Core (POC)
 
-POC de um módulo integrador para marketplaces, simulando o núcleo arquitetural de um ERP com integração bidirecional.
+Event-driven marketplace integration prototype designed to demonstrate the architectural core of an ERP integration module.
 
-## Objetivo da POC
+This project simulates how an ERP can integrate with marketplaces such as Mercado Livre using a resilient event-driven architecture.
 
-Demonstrar domínio técnico sobre:
+## Key Concepts Demonstrated
 
-- Webhooks
-- Fila com Redis Streams
-- Worker desacoplado
-- Idempotência
-- Retry com backoff
-- Persistência e auditoria
-- Reprocessamento manual
+• Webhook ingestion  
+• Idempotent event processing  
+• Redis Streams queue  
+• Worker-based processing  
+• Retry with backoff  
+• Event audit logs  
+• Manual event reprocessing
 
-## Arquitetura
+## Architecture Overview
 
-Webhook (HTTP)
-→ Persistência do evento (SQLite)
-→ Enfileiramento no Redis Streams
-→ Worker (consumer group)
-→ Processamento
-→ Logs e status final
+Webhook → Event Persistence → Redis Streams → Worker → Marketplace API → Event Logs
 
-## Componentes
+Key architectural decisions:
 
-- Express (HTTP Server)
-- Redis Streams (Fila)
-- Worker separado
-- SQLite (Persistência)
-- Endpoint de auditoria e reprocesso
+• Webhook performs no heavy processing  
+• Events are persisted before queueing  
+• Redis Streams ensures reliable delivery  
+• Worker processes events asynchronously  
+• Retry and backoff mechanisms prevent event loss  
+• All events are auditable and reprocessable  
 
 ## Endpoints
 
@@ -39,24 +35,30 @@ GET /events/:id/logs
 POST /webhook/ml  
 POST /events/:id/reprocess  
 
-## Conceitos aplicados
+## Running Locally
 
-- Idempotency key por evento
-- Retry controlado com limite de tentativas
-- Backoff exponencial
-- Separação entre entrada HTTP e processamento pesado
-- Consumer Group no Redis
-- Persistência do estado do evento
+1. Install dependencies
 
-## Como executar
+npm install
 
-1. Subir Redis
-2. Rodar migrations
-3. Subir servidor
-4. Subir worker
-5. Testar webhook
+2. Start Redis
 
----
+docker run --name redis-poc -p 6379:6379 -d redis:7
 
-Esta POC representa apenas o núcleo arquitetural.
-Não integra com ERP real.
+3. Run migrations
+
+node src/migrate.js
+
+4. Start the HTTP server
+
+node src/server.js
+
+5. Start the worker
+
+node src/worker.js
+
+## Notes
+
+This project represents the architectural core of a marketplace integration module.
+
+It is a proof of concept and does not integrate with a real ERP system.
